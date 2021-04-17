@@ -3,8 +3,9 @@ package br.com.borserog.minhascores
 import java.io.Serializable
 
 class ColorConfig : Serializable {
+
     var id: Int
-    var nome: String
+    lateinit var nome: String
     var codigo: Int
 
     constructor(nome: String, codigo: Int) {
@@ -24,7 +25,7 @@ class ColorConfig : Serializable {
     }
 
     override fun toString(): String {
-        return "$nome \n${toHex()}"
+        return "ColorConfig(id=$id, nome='$nome', codigo=$codigo)"
     }
 
 

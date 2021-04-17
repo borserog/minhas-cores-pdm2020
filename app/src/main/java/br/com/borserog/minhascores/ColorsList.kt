@@ -15,6 +15,13 @@ class ColorsList {
         this.colorList.remove(colorConfig)
     }
 
+    fun replace(colorConfig: ColorConfig) {
+        val foundColorConfig = this.colorList.find { it.id == colorConfig.id  }
+        val index = this.colorList.indexOf(foundColorConfig)
+
+        this.colorList.set(index, colorConfig)
+    }
+
     operator fun get(index: Int): ColorConfig {
         return this.colorList[index]
     }

@@ -12,6 +12,9 @@ import android.widget.Toast
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 var ADD_COLOR_CONFIG = 1
+var EDIT_COLOR_CONFIG = 2
+
+var initialId = 0
 
 class MainActivity : AppCompatActivity() {
     private lateinit var addColorBtn: FloatingActionButton
@@ -28,9 +31,22 @@ class MainActivity : AppCompatActivity() {
         this.colorListRef = findViewById(R.id.colorList)
 
         this.colorListRef.adapter = ColorConfigAdapter(this, colorsList);
+
+        this.colorListRef.onItemClickListener = ShortItemClick()
         this.colorListRef.onItemLongClickListener = LongItemClick()
 
         this.addColorBtn.setOnClickListener { onAddButtonTapped(it) }
+    }
+
+    inner class ShortItemClick : AdapterView.OnItemClickListener {
+        override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            val color = this@MainActivity.colorsList[position]
+
+            val intent = Intent(this@MainActivity, ColorForm::class.java)
+            intent.putExtra("edit_color", color)
+
+            startActivityForResult(intent, EDIT_COLOR_CONFIG)
+        }
     }
 
     private fun onAddButtonTapped(it: View?) {
@@ -44,18 +60,38 @@ class MainActivity : AppCompatActivity() {
         (colorListRef.adapter as ColorConfigAdapter).notifyDataSetChanged()
     }
 
+    private fun replaceColor(colorConfig: ColorConfig) {
+        colorsList.replace(colorConfig)
+        (colorListRef.adapter as ColorConfigAdapter).notifyDataSetChanged()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         when (resultCode) {
-            RESULT_OK -> {
+            10 -> {
                 val newColor = data?.getSerializableExtra("new_color") as ColorConfig?
 
-                Log.i("DEV", newColor.toString())
 
                 if (newColor != null) {
+                    newColor.id = ++initialId
                     addNewColor(newColor)
+
+                    Log.i("DEV", newColor.toString())
+
                     Toast.makeText(this, "Cor cadastrada", Toast.LENGTH_SHORT).show()
+                }
+            }
+            20 -> {
+                val editedColor = data?.getSerializableExtra("edit_color") as ColorConfig?
+
+
+                if (editedColor != null) {
+                    replaceColor(editedColor)
+
+                    Log.i("DEV", editedColor.toString())
+
+                    Toast.makeText(this, "Cor editada", Toast.LENGTH_SHORT).show()
                 }
             }
             RESULT_CANCELED -> Toast.makeText(this, "Cancelado", Toast.LENGTH_SHORT).show()

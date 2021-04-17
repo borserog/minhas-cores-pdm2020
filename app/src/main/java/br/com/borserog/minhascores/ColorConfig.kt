@@ -24,7 +24,7 @@ class ColorConfig : Serializable {
     }
 
     override fun toString(): String {
-        return "ColorConfig(id=$id, nome='$nome', codigo=$codigo)"
+        return "$nome \n${toHex()}"
     }
 
 

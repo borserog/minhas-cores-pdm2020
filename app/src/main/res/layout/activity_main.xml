@@ -16,10 +16,11 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_margin="16dp"
+        app:tint="@color/white"
         app:srcCompat="@drawable/ic_baseline_add_24"/>
 
     <ListView
-        android:id="@+id/listaDesejosRef"
+        android:id="@+id/colorList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

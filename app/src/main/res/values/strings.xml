@@ -3,4 +3,5 @@
     <string name="add_color_button">add-color-button</string>
     <string name="cor">Cor</string>
     <string name="nome_da_nova_cor">Nome da nova cor</string>
+    <string name="thumbnail" />
 </resources>

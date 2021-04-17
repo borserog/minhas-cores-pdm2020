@@ -14,28 +14,36 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 var ADD_COLOR_CONFIG = 1
 var EDIT_COLOR_CONFIG = 2
 
-var initialId = 0
-
 class MainActivity : AppCompatActivity() {
     private lateinit var addColorBtn: FloatingActionButton
     private lateinit var colorListRef: ListView
     private lateinit var colorsList: ColorsList
+    private lateinit var dao: ColorConfigDAO
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        this.colorsList = ColorsList()
+        this.dao = ColorConfigDAO(this)
 
-        this.addColorBtn = findViewById(R.id.fabBtn)
+        this.colorsList = ColorsList()
         this.colorListRef = findViewById(R.id.colorList)
 
         this.colorListRef.adapter = ColorConfigAdapter(this, colorsList);
+
+        this.updateColorList()
+
+        this.addColorBtn = findViewById(R.id.fabBtn)
 
         this.colorListRef.onItemClickListener = ShortItemClick()
         this.colorListRef.onItemLongClickListener = LongItemClick()
 
         this.addColorBtn.setOnClickListener { onAddButtonTapped(it) }
+    }
+
+    private fun updateColorList() {
+        this.colorsList.set(this.dao.select())
+        (colorListRef.adapter as ColorConfigAdapter).notifyDataSetChanged()
     }
 
     inner class ShortItemClick : AdapterView.OnItemClickListener {
@@ -55,11 +63,6 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(intent, ADD_COLOR_CONFIG)
     }
 
-    private fun addNewColor(colorConfig: ColorConfig) {
-        colorsList.add(colorConfig)
-        (colorListRef.adapter as ColorConfigAdapter).notifyDataSetChanged()
-    }
-
     private fun replaceColor(colorConfig: ColorConfig) {
         colorsList.replace(colorConfig)
         (colorListRef.adapter as ColorConfigAdapter).notifyDataSetChanged()
@@ -74,10 +77,7 @@ class MainActivity : AppCompatActivity() {
 
 
                 if (newColor != null) {
-                    newColor.id = ++initialId
-                    addNewColor(newColor)
-
-                    Log.i("DEV", newColor.toString())
+                    this.dao.insert(newColor)
 
                     Toast.makeText(this, "Cor cadastrada", Toast.LENGTH_SHORT).show()
                 }
@@ -85,9 +85,8 @@ class MainActivity : AppCompatActivity() {
             20 -> {
                 val editedColor = data?.getSerializableExtra("edit_color") as ColorConfig?
 
-
                 if (editedColor != null) {
-                    replaceColor(editedColor)
+                    this.dao.update(editedColor)
 
                     Log.i("DEV", editedColor.toString())
 
@@ -97,14 +96,16 @@ class MainActivity : AppCompatActivity() {
             RESULT_CANCELED -> Toast.makeText(this, "Cancelado", Toast.LENGTH_SHORT).show()
         }
 
+        this.updateColorList()
     }
 
     inner class LongItemClick: AdapterView.OnItemLongClickListener {
         override fun onItemLongClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long): Boolean {
             val color = this@MainActivity.colorsList[position]
             Toast.makeText(this@MainActivity, "Cor ${color.nome} removida", Toast.LENGTH_SHORT).show()
-            colorsList.remove(color);
-            (colorListRef.adapter as ColorConfigAdapter).notifyDataSetChanged()
+            this@MainActivity.dao.delete(color.id)
+            this@MainActivity.updateColorList()
+
             return true
         }
     }

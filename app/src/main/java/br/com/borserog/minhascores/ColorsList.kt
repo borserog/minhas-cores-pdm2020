@@ -30,6 +30,10 @@ class ColorsList {
         return this.colorList
     }
 
+    fun set(colors: ArrayList<ColorConfig>) {
+        this.colorList = colors
+    }
+
     fun count(): Int {
         return this.colorList.count()
     }
